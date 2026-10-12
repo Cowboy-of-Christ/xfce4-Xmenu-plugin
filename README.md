@@ -18,6 +18,7 @@ A panel plugin for XFCE4 that mimics the macOS Apple menu, providing a familiar 
 
 - **About This Computer** - System information and details
 - **System Preferences** - Quick access to XFCE Settings Manager
+- **Software Update** - Launch your configured software updater
 - **App Store** - Launch system package manager
 - **Recent Items** - Recently accessed documents and applications
 - **Force Quit** - Application management
@@ -90,7 +91,7 @@ sudo dpkg -i ../xfce4-applemenu-plugin_*.deb
 Right-click on the plugin in the panel and select "Properties" to access:
 
 - Icon selection (Command logo or custom)
-- Commands for About This Computer, App Store, and Force Quit
+- Commands for About This Computer, Software Update, App Store, and Force Quit
 - Recent items settings
 - Menu behavior options
 - Keyboard shortcuts
@@ -100,6 +101,7 @@ Right-click on the plugin in the panel and select "Properties" to access:
 In Properties, enter the executable and any arguments for each menu item:
 
 - **About This Computer command**: for example, `xfce4-about` or `hardinfo`. Leave empty to use the built-in information dialog.
+- **Software Update command**: enter your installed updater executable and any arguments. Initially empty; selecting Software Update without a command prompts you to configure it in Properties.
 - **Force Quit command**: for example, `xfce4-taskmanager`. Defaults to `xkill`; an empty field also uses `xkill`.
 - **App Store command**: your preferred package manager (see below).
 

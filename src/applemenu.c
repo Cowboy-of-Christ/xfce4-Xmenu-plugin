@@ -45,6 +45,7 @@ typedef struct {
     gboolean         use_apple_logo;
     gchar           *custom_icon_name;
     gchar           *app_store_command;
+    gchar           *software_update_command;
     gchar           *about_computer_command;
     gchar           *force_quit_command;
     gint             transparency;
@@ -65,6 +66,7 @@ static void applemenu_load_config(AppleMenuPlugin *applemenu);
 /* Menu callbacks */
 static void applemenu_about_computer(GtkMenuItem *item G_GNUC_UNUSED, gpointer data);
 static void applemenu_system_preferences(GtkMenuItem *item G_GNUC_UNUSED, gpointer data);
+static void applemenu_software_update(GtkMenuItem *item G_GNUC_UNUSED, gpointer data);
 static void applemenu_app_store(GtkMenuItem *item G_GNUC_UNUSED, gpointer data);
 static void applemenu_force_quit(GtkMenuItem *item G_GNUC_UNUSED, gpointer data);
 static void applemenu_sleep(GtkMenuItem *item G_GNUC_UNUSED, gpointer data);
@@ -96,6 +98,7 @@ applemenu_construct(XfcePanelPlugin *plugin)
     applemenu->use_apple_logo = TRUE;
     applemenu->custom_icon_name = g_strdup(APPLEMENU_ICON_NAME);
     applemenu->app_store_command = g_strdup(DEFAULT_APP_STORE_COMMAND);
+    applemenu->software_update_command = g_strdup(DEFAULT_SOFTWARE_UPDATE_COMMAND);
     applemenu->about_computer_command = g_strdup(DEFAULT_ABOUT_COMPUTER_COMMAND);
     applemenu->force_quit_command = g_strdup(DEFAULT_FORCE_QUIT_COMMAND);
     applemenu->transparency = DEFAULT_TRANSPARENCY;
@@ -163,6 +166,8 @@ applemenu_free_data(XfcePanelPlugin *plugin G_GNUC_UNUSED, AppleMenuPlugin *appl
     
     g_free(applemenu->about_computer_command);
     g_free(applemenu->force_quit_command);
+
+    g_free(applemenu->software_update_command);
 
     /* Free plugin structure */
     g_slice_free(AppleMenuPlugin, applemenu);
@@ -237,6 +242,15 @@ applemenu_create_menu(AppleMenuPlugin *applemenu)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
     gtk_widget_show(item);
     
+    /* Software Update */
+    item = gtk_image_menu_item_new_with_mnemonic(_("Software _Update..."));
+    image = gtk_image_new_from_icon_name("system-software-update", GTK_ICON_SIZE_MENU);
+    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item), image);
+    g_signal_connect(G_OBJECT(item), "activate",
+                     G_CALLBACK(applemenu_software_update), applemenu);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+    gtk_widget_show(item);
+
     /* App Store (Pamac) */
     item = gtk_image_menu_item_new_with_mnemonic(_("_App Store..."));
     image = gtk_image_new_from_icon_name("system-software-install", GTK_ICON_SIZE_MENU);
@@ -478,6 +492,24 @@ applemenu_system_preferences(GtkMenuItem *item G_GNUC_UNUSED, gpointer data G_GN
 }
 
 static void
+applemenu_software_update(GtkMenuItem *item G_GNUC_UNUSED, gpointer data)
+{
+    AppleMenuPlugin *applemenu = (AppleMenuPlugin *)data;
+    GError *error = NULL;
+
+    if (applemenu->software_update_command[0] == '\0') {
+        xfce_dialog_show_error(NULL, NULL,
+                              _("Set a Software Update command in the plugin Properties first."));
+        return;
+    }
+
+    if (!g_spawn_command_line_async(applemenu->software_update_command, &error)) {
+        xfce_dialog_show_error(NULL, error, _("Failed to open Software Update"));
+        g_error_free(error);
+    }
+}
+
+static void
 applemenu_app_store(GtkMenuItem *item G_GNUC_UNUSED, gpointer data)
 {
     AppleMenuPlugin *applemenu = (AppleMenuPlugin *)data;
@@ -596,6 +628,9 @@ applemenu_load_config(AppleMenuPlugin *applemenu)
     g_free(applemenu->force_quit_command);
     applemenu->force_quit_command = g_strdup(xfce_rc_read_entry(rc, "force-quit-command", DEFAULT_FORCE_QUIT_COMMAND));
 
+    g_free(applemenu->software_update_command);
+    applemenu->software_update_command = g_strdup(xfce_rc_read_entry(rc, "software-update-command", DEFAULT_SOFTWARE_UPDATE_COMMAND));
+
     applemenu->transparency = xfce_rc_read_int_entry(rc, "transparency", DEFAULT_TRANSPARENCY);
     
     /* Close config file */
@@ -643,6 +678,7 @@ applemenu_save_config(XfcePanelPlugin *plugin, AppleMenuPlugin *applemenu)
     xfce_rc_write_entry(rc, "app-store-command", applemenu->app_store_command);
     xfce_rc_write_entry(rc, "about-computer-command", applemenu->about_computer_command);
     xfce_rc_write_entry(rc, "force-quit-command", applemenu->force_quit_command);
+    xfce_rc_write_entry(rc, "software-update-command", applemenu->software_update_command);
     xfce_rc_write_int_entry(rc, "transparency", applemenu->transparency);
     
     /* Close config file */
@@ -811,6 +847,9 @@ applemenu_configure_plugin(XfcePanelPlugin *plugin, AppleMenuPlugin *applemenu)
     applemenu_add_command_entry(GTK_GRID(grid), row++, _("_About This Computer command:"),
                                 _("Leave empty to show the built-in system information dialog."),
                                 &applemenu->about_computer_command);
+    applemenu_add_command_entry(GTK_GRID(grid), row++, _("Software _Update command:"),
+                                _("Enter the command for your preferred software updater."),
+                                &applemenu->software_update_command);
     applemenu_add_command_entry(GTK_GRID(grid), row++, _("_App Store command:"),
                                 NULL, &applemenu->app_store_command);
     applemenu_add_command_entry(GTK_GRID(grid), row++, _("_Force Quit command:"),
