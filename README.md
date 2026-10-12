@@ -90,9 +90,20 @@ sudo dpkg -i ../xfce4-applemenu-plugin_*.deb
 Right-click on the plugin in the panel and select "Properties" to access:
 
 - Icon selection (Apple logo or custom)
+- Commands for About This Computer, App Store, and Force Quit
 - Recent items settings
 - Menu behavior options
 - Keyboard shortcuts
+
+### Menu Commands
+
+In Properties, enter the executable and any arguments for each menu item:
+
+- **About This Computer command**: for example, `xfce4-about` or `hardinfo`. Leave empty to use the built-in information dialog.
+- **Force Quit command**: for example, `xfce4-taskmanager`. Defaults to `xkill`; an empty field also uses `xkill`.
+- **App Store command**: your preferred package manager (see below).
+
+The selected programs must be installed. Commands support arguments and quoted paths, using the same launcher as App Store. Shell operators such as pipes and redirection are not interpreted; use an explicit `sh -c '...'` command if needed. Settings are saved when the Properties dialog closes and restored when the panel restarts.
 
 ## Package Manager Integration
 

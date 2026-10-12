@@ -27,6 +27,8 @@ G_BEGIN_DECLS
 /* Plugin definitions */
 #define APPLEMENU_ICON_NAME "apple-logo"
 #define APPLEMENU_FALLBACK_ICON "distributor-logo"
+#define DEFAULT_ABOUT_COMPUTER_COMMAND ""
+#define DEFAULT_FORCE_QUIT_COMMAND "xkill"
 #define DEFAULT_APP_STORE_COMMAND "pamac-manager"
 #define DEFAULT_TRANSPARENCY 100
 

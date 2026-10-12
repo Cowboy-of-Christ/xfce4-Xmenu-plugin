@@ -45,6 +45,8 @@ typedef struct {
     gboolean         use_apple_logo;
     gchar           *custom_icon_name;
     gchar           *app_store_command;
+    gchar           *about_computer_command;
+    gchar           *force_quit_command;
     gint             transparency;
 } AppleMenuPlugin;
 
@@ -94,6 +96,8 @@ applemenu_construct(XfcePanelPlugin *plugin)
     applemenu->use_apple_logo = TRUE;
     applemenu->custom_icon_name = g_strdup(APPLEMENU_ICON_NAME);
     applemenu->app_store_command = g_strdup(DEFAULT_APP_STORE_COMMAND);
+    applemenu->about_computer_command = g_strdup(DEFAULT_ABOUT_COMPUTER_COMMAND);
+    applemenu->force_quit_command = g_strdup(DEFAULT_FORCE_QUIT_COMMAND);
     applemenu->transparency = DEFAULT_TRANSPARENCY;
     applemenu->menu_visible = FALSE;
     
@@ -157,6 +161,9 @@ applemenu_free_data(XfcePanelPlugin *plugin G_GNUC_UNUSED, AppleMenuPlugin *appl
     g_free(applemenu->custom_icon_name);
     g_free(applemenu->app_store_command);
     
+    g_free(applemenu->about_computer_command);
+    g_free(applemenu->force_quit_command);
+
     /* Free plugin structure */
     g_slice_free(AppleMenuPlugin, applemenu);
 }
@@ -408,6 +415,16 @@ applemenu_about_computer(GtkMenuItem *item G_GNUC_UNUSED, gpointer data)
     gchar *text;
     struct utsname un;
     
+    /* An empty command keeps the built-in system information dialog. */
+    if (applemenu->about_computer_command[0] != '\0') {
+        GError *error = NULL;
+        if (!g_spawn_command_line_async(applemenu->about_computer_command, &error)) {
+            xfce_dialog_show_error(NULL, error, _("Failed to open About This Computer"));
+            g_error_free(error);
+        }
+        return;
+    }
+
     /* Get system information */
     uname(&un);
     
@@ -476,11 +493,15 @@ applemenu_app_store(GtkMenuItem *item G_GNUC_UNUSED, gpointer data)
 }
 
 static void
-applemenu_force_quit(GtkMenuItem *item G_GNUC_UNUSED, gpointer data G_GNUC_UNUSED)
+applemenu_force_quit(GtkMenuItem *item G_GNUC_UNUSED, gpointer data)
 {
-    /* Launch xkill */
+    AppleMenuPlugin *applemenu = (AppleMenuPlugin *)data;
+    const gchar *command = applemenu->force_quit_command[0] != '\0'
+        ? applemenu->force_quit_command : DEFAULT_FORCE_QUIT_COMMAND;
+
+    /* Launch the configured application, or xkill when empty. */
     GError *error = NULL;
-    if (!g_spawn_command_line_async("xkill", &error)) {
+    if (!g_spawn_command_line_async(command, &error)) {
         xfce_dialog_show_error(NULL, error, _("Failed to launch Force Quit"));
         g_error_free(error);
     }
@@ -570,6 +591,11 @@ applemenu_load_config(AppleMenuPlugin *applemenu)
     g_free(applemenu->app_store_command);
     applemenu->app_store_command = g_strdup(xfce_rc_read_entry(rc, "app-store-command", DEFAULT_APP_STORE_COMMAND));
     
+    g_free(applemenu->about_computer_command);
+    applemenu->about_computer_command = g_strdup(xfce_rc_read_entry(rc, "about-computer-command", DEFAULT_ABOUT_COMPUTER_COMMAND));
+    g_free(applemenu->force_quit_command);
+    applemenu->force_quit_command = g_strdup(xfce_rc_read_entry(rc, "force-quit-command", DEFAULT_FORCE_QUIT_COMMAND));
+
     applemenu->transparency = xfce_rc_read_int_entry(rc, "transparency", DEFAULT_TRANSPARENCY);
     
     /* Close config file */
@@ -615,6 +641,8 @@ applemenu_save_config(XfcePanelPlugin *plugin, AppleMenuPlugin *applemenu)
     xfce_rc_write_int_entry(rc, "recent-items-max", applemenu->recent_items_max);
     xfce_rc_write_entry(rc, "custom-icon-name", applemenu->custom_icon_name);
     xfce_rc_write_entry(rc, "app-store-command", applemenu->app_store_command);
+    xfce_rc_write_entry(rc, "about-computer-command", applemenu->about_computer_command);
+    xfce_rc_write_entry(rc, "force-quit-command", applemenu->force_quit_command);
     xfce_rc_write_int_entry(rc, "transparency", applemenu->transparency);
     
     /* Close config file */
@@ -646,8 +674,8 @@ applemenu_configure_response(GtkWidget *dialog, gint response, AppleMenuPlugin *
         }
         applemenu_create_menu(applemenu);
         
-        /* Hide dialog instead of destroying to avoid issues */
-        gtk_widget_hide(dialog);
+        /* Release the entries and their signal handlers on close. */
+        gtk_widget_destroy(dialog);
         
         /* Unblock panel menu */
         xfce_panel_plugin_unblock_menu(applemenu->plugin);
@@ -704,12 +732,38 @@ applemenu_transparency_changed(GtkScale *scale, AppleMenuPlugin *applemenu)
     }
 }
 
+/* Keep command strings owned by the plugin, rather than the entry widget. */
+static void
+applemenu_command_changed(GtkEntry *entry, gchar **command)
+{
+    g_free(*command);
+    *command = g_strdup(gtk_entry_get_text(entry));
+}
+
+static void
+applemenu_add_command_entry(GtkGrid *grid, gint row, const gchar *title,
+                            const gchar *tooltip, gchar **command)
+{
+    GtkWidget *label = gtk_label_new_with_mnemonic(title);
+    GtkWidget *entry = gtk_entry_new();
+
+    gtk_label_set_xalign(GTK_LABEL(label), 0.0);
+    gtk_grid_attach(grid, label, 0, row, 1, 1);
+    gtk_entry_set_text(GTK_ENTRY(entry), *command);
+    gtk_widget_set_hexpand(entry, TRUE);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
+    if (tooltip)
+        gtk_widget_set_tooltip_text(entry, tooltip);
+    g_signal_connect(entry, "changed", G_CALLBACK(applemenu_command_changed), command);
+    gtk_grid_attach(grid, entry, 1, row, 1, 1);
+}
+
 /* Configuration dialog */
 static void
 applemenu_configure_plugin(XfcePanelPlugin *plugin, AppleMenuPlugin *applemenu)
 {
     GtkWidget *dialog, *content_area, *grid;
-    GtkWidget *label, *entry, *button, *scale, *check;
+    GtkWidget *label, *button, *scale, *check;
     GtkWidget *icon;
     gint row = 0;
     
@@ -753,24 +807,16 @@ applemenu_configure_plugin(XfcePanelPlugin *plugin, AppleMenuPlugin *applemenu)
                      G_CALLBACK(applemenu_icon_chooser_clicked), applemenu);
     gtk_grid_attach(GTK_GRID(grid), button, 1, row++, 1, 1);
     
-    /* App Store command */
-    label = gtk_label_new_with_mnemonic(_("_App Store command:"));
-    gtk_label_set_xalign(GTK_LABEL(label), 0.0);
-    gtk_grid_attach(GTK_GRID(grid), label, 0, row, 1, 1);
-    
-    entry = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(entry), applemenu->app_store_command);
-    gtk_widget_set_hexpand(entry, TRUE);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
-    g_signal_connect(G_OBJECT(entry), "changed",
-                     G_CALLBACK(g_free), applemenu->app_store_command);
-    g_signal_connect(G_OBJECT(entry), "changed",
-                     G_CALLBACK(g_strdup), &applemenu->app_store_command);
-    g_object_set_data(G_OBJECT(entry), "applemenu", applemenu);
-    g_signal_connect(G_OBJECT(entry), "focus-out-event",
-                     G_CALLBACK(gtk_entry_get_text), entry);
-    gtk_grid_attach(GTK_GRID(grid), entry, 1, row++, 1, 1);
-    
+    /* Configurable menu commands */
+    applemenu_add_command_entry(GTK_GRID(grid), row++, _("_About This Computer command:"),
+                                _("Leave empty to show the built-in system information dialog."),
+                                &applemenu->about_computer_command);
+    applemenu_add_command_entry(GTK_GRID(grid), row++, _("_App Store command:"),
+                                NULL, &applemenu->app_store_command);
+    applemenu_add_command_entry(GTK_GRID(grid), row++, _("_Force Quit command:"),
+                                _("Leave empty to use xkill."),
+                                &applemenu->force_quit_command);
+
     /* Transparency */
     label = gtk_label_new_with_mnemonic(_("_Transparency:"));
     gtk_label_set_xalign(GTK_LABEL(label), 0.0);
