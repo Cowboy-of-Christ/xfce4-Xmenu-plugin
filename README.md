@@ -86,6 +86,23 @@ xfce4-panel -r
 sudo dpkg -i ../xfce4-applemenu-plugin_*.deb
 ```
 
+## Automatic Builds (Devuan)
+
+The **Build Devuan packages** GitHub Actions workflow builds installable `.deb` packages for **Devuan Daedalus (5)** and **Devuan Excalibur (6)** on **amd64**. Each build uses the corresponding official `devuan/devuan` container, packages the plugin with the existing Debian packaging, and checks package installation and linked runtime libraries. It does not require systemd to run.
+
+Builds run automatically on pushes to `main` (including PR merges) and pull requests targeting `main`. PR builds test GitHub's temporary merge with the base branch.
+
+Once the workflow is merged into `main`, you can also run it manually:
+
+1. Open **Actions → Build Devuan packages → Run workflow**.
+2. Select a branch, or enter an optional **pull_request** number to build that PR's latest source without merging it. A manual PR build uses the PR head, rather than the temporary merge.
+3. Open the completed run and download the artifact for your Devuan release. Extract the ZIP to obtain the `.deb`, checksums and build information. Artifacts are retained for 30 days.
+4. Install the main package with `sudo apt install ./xfce4-applemenu-plugin_<version>_amd64.deb`, then restart the panel with `xfce4-panel -r`.
+
+Use the package matching your system's Devuan base release. For derivatives, confirm that the base release and Xfce/GTK libraries match; a successful CI build does not prove runtime compatibility with a customized desktop or XLibre setup. These builds do not test the live panel UI. If unsure, inspect `/etc/os-release` and `apt-cache policy xfce4-panel libc6`. ARM and 32-bit systems are not covered.
+
+CI versions include the workflow run, attempt, target release and source commit so test packages are identifiable. The workflow creates downloadable build artifacts; it does not publish a GitHub Release.
+
 ## Configuration
 
 Right-click on the plugin in the panel and select "Properties" to access:
