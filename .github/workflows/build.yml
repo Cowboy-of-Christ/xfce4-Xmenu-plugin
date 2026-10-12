@@ -1,0 +1,125 @@
+name: Build Devuan packages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      pull_request:
+        description: 'Optional PR number to build (blank = selected branch)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: devuan-build-${{ github.event_name }}-${{ github.event.pull_request.number || inputs.pull_request || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Devuan ${{ matrix.release }} (amd64)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        release: [daedalus, excalibur]
+    container:
+      image: devuan/devuan:${{ matrix.release }}
+    defaults:
+      run:
+        shell: sh
+    env:
+      DEBIAN_FRONTEND: noninteractive
+
+    steps:
+      - name: Select source
+        id: source
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ inputs.pull_request }}
+          DEFAULT_REF: ${{ github.ref }}
+        run: |
+          set -eu
+          if [ "$EVENT_NAME" = workflow_dispatch ] && [ -n "$PR_NUMBER" ]; then
+            if ! printf '%s\n' "$PR_NUMBER" | grep -Eq '^[1-9][0-9]*$'; then
+              echo 'PR number must be a positive integer.' >&2
+              exit 1
+            fi
+            printf 'ref=refs/pull/%s/head\n' "$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          else
+            printf 'ref=%s\n' "$DEFAULT_REF" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install build tools and dependencies
+        run: |
+          set -eu
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates git build-essential debhelper meson ninja-build \
+            pkg-config gettext libxfce4panel-2.0-dev libxfce4ui-2-dev \
+            libxfce4util-dev libgtk-3-dev libglib2.0-dev \
+            libexo-2-dev libdbus-glib-1-dev
+
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.source.outputs.ref }}
+          persist-credentials: false
+
+      - name: Build Debian package
+        env:
+          RELEASE: ${{ matrix.release }}
+          SOURCE_REF: ${{ steps.source.outputs.ref }}
+        run: |
+          set -eu
+          # The workspace is owned by the runner, not the container user.
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          commit=$(git rev-parse HEAD)
+          short_commit=$(git rev-parse --short=12 HEAD)
+          version=$(dpkg-parsechangelog -S Version)
+          ci_version="${version}+ci${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}.${RELEASE}.${short_commit}"
+          sed -i "1s/([^)]*)/(${ci_version})/" debian/changelog
+          dpkg-buildpackage --build=binary --no-sign
+          mkdir -p artifacts
+          cp ../xfce4-applemenu-plugin_*.deb artifacts/
+          cp ../xfce4-applemenu-plugin_*.buildinfo artifacts/
+          cp ../xfce4-applemenu-plugin_*.changes artifacts/
+          {
+            printf 'Source commit: %s\n' "$commit"
+            printf 'Source ref: %s\n' "$SOURCE_REF"
+            printf 'Target: Devuan %s, amd64\n' "$RELEASE"
+            printf 'Package version: %s\n' "$ci_version"
+            printf '\nBuild environment:\n'
+            cat /etc/os-release
+            printf '\nLibrary versions:\n'
+            pkg-config --modversion gtk+-3.0 libxfce4panel-2.0 libxfce4ui-2 libxfce4util-1.0
+          } > artifacts/BUILD-INFO.txt
+          (cd artifacts && sha256sum *.deb > SHA256SUMS)
+
+      - name: Verify package installation and linked libraries
+        run: |
+          set -eu
+          apt-get install -y --no-install-recommends ./artifacts/xfce4-applemenu-plugin_*.deb
+          dpkg-query -W xfce4-applemenu-plugin
+          plugin=$(dpkg-query -L xfce4-applemenu-plugin | sed -n '/\/libapplemenu\.so$/p')
+          test -n "$plugin"
+          ldd "$plugin" > artifacts/LINKED-LIBRARIES.txt
+          cat artifacts/LINKED-LIBRARIES.txt
+          if grep -q 'not found' artifacts/LINKED-LIBRARIES.txt; then
+            echo 'The plugin has missing runtime libraries.' >&2
+            exit 1
+          fi
+          dpkg-deb --contents artifacts/xfce4-applemenu-plugin_*.deb
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: xfce4-applemenu-plugin-devuan-${{ matrix.release }}-amd64-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
