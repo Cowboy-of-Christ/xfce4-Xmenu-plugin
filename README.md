@@ -18,6 +18,7 @@ A panel plugin for XFCE4 that mimics the macOS Apple menu, providing a familiar 
 
 - **About This Computer** - System information and details
 - **System Preferences** - Quick access to XFCE Settings Manager
+- **Software Update** - Launch your configured software updater
 - **App Store** - Launch system package manager
 - **Recent Items** - Recently accessed documents and applications
 - **Force Quit** - Application management
@@ -85,14 +86,43 @@ xfce4-panel -r
 sudo dpkg -i ../xfce4-applemenu-plugin_*.deb
 ```
 
+## Automatic Builds (Devuan)
+
+The **Build Devuan packages** GitHub Actions workflow builds installable `.deb` packages for **Devuan Daedalus (5)** and **Devuan Excalibur (6)** on **amd64**. Each build uses the corresponding official `devuan/devuan` container, packages the plugin with the existing Debian packaging, and checks package installation and linked runtime libraries. It does not require systemd to run.
+
+Builds run automatically on pushes to `main` (including PR merges) and pull requests targeting `main`. PR builds test GitHub's temporary merge with the base branch.
+
+Once the workflow is merged into `main`, you can also run it manually:
+
+1. Open **Actions → Build Devuan packages → Run workflow**.
+2. Select a branch, or enter an optional **pull_request** number to build that PR's latest source without merging it. A manual PR build uses the PR head, rather than the temporary merge.
+3. Open the completed run and download the artifact for your Devuan release. Extract the ZIP to obtain the `.deb`, checksums and build information. Artifacts are retained for 30 days.
+4. Install the main package with `sudo apt install ./xfce4-applemenu-plugin_<version>_amd64.deb`, then restart the panel with `xfce4-panel -r`.
+
+Use the package matching your system's Devuan base release. For derivatives, confirm that the base release and Xfce/GTK libraries match; a successful CI build does not prove runtime compatibility with a customized desktop or XLibre setup. These builds do not test the live panel UI. If unsure, inspect `/etc/os-release` and `apt-cache policy xfce4-panel libc6`. ARM and 32-bit systems are not covered.
+
+CI versions include the workflow run, attempt, target release and source commit so test packages are identifiable. The workflow creates downloadable build artifacts; it does not publish a GitHub Release.
+
 ## Configuration
 
 Right-click on the plugin in the panel and select "Properties" to access:
 
 - Icon selection (Command logo or custom)
+- Commands for About This Computer, Software Update, App Store, and Force Quit
 - Recent items settings
 - Menu behavior options
 - Keyboard shortcuts
+
+### Menu Commands
+
+In Properties, enter the executable and any arguments for each menu item:
+
+- **About This Computer command**: for example, `xfce4-about` or `hardinfo`. Leave empty to use the built-in information dialog.
+- **Software Update command**: enter your installed updater executable and any arguments. Initially empty; selecting Software Update without a command prompts you to configure it in Properties.
+- **Force Quit command**: for example, `xfce4-taskmanager`. Defaults to `xkill`; an empty field also uses `xkill`.
+- **App Store command**: your preferred package manager (see below).
+
+The selected programs must be installed. Commands support arguments and quoted paths, using the same launcher as App Store. Shell operators such as pipes and redirection are not interpreted; use an explicit `sh -c '...'` command if needed. Settings are saved when the Properties dialog closes and restored when the panel restarts.
 
 ## Package Manager Integration
 
