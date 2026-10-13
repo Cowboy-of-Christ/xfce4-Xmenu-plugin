@@ -87,6 +87,7 @@ applemenu_construct(XfcePanelPlugin *plugin)
 {
     AppleMenuPlugin *applemenu;
     GtkWidget *icon;
+    GtkCssProvider *button_css;
     
     /* Allocate plugin structure */
     applemenu = g_slice_new0(AppleMenuPlugin);
@@ -108,6 +109,23 @@ applemenu_construct(XfcePanelPlugin *plugin)
     applemenu->button = xfce_panel_create_button();
     gtk_widget_set_tooltip_text(applemenu->button, _("Apple Menu"));
     gtk_button_set_relief(GTK_BUTTON(applemenu->button), GTK_RELIEF_NONE);
+
+    /* Some themes still paint borders/images on flat panel buttons. Apply
+     * this provider only to our launcher, preserving themed hover colors
+     * and the keyboard focus indicator. */
+    gtk_widget_set_name(applemenu->button, "applemenu-button");
+    button_css = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(button_css,
+        "#applemenu-button {"
+        " border-style: none;"
+        " border-width: 0;"
+        " border-image: none;"
+        " box-shadow: none;"
+        "}", -1, NULL);
+    gtk_style_context_add_provider(gtk_widget_get_style_context(applemenu->button),
+                                   GTK_STYLE_PROVIDER(button_css),
+                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    g_object_unref(button_css);
     
     /* Create icon */
     icon = gtk_image_new_from_icon_name(APPLEMENU_ICON_NAME, GTK_ICON_SIZE_BUTTON);
