@@ -1,6 +1,16 @@
 name: Build Devuan packages
 
 on:
+  workflow_call:
+    inputs:
+      source_sha:
+        description: 'Exact commit to build for a release'
+        required: true
+        type: string
+      package_version:
+        description: 'Debian version before the per-Devuan suffix'
+        required: true
+        type: string
   push:
     branches: [main]
   pull_request:
@@ -16,7 +26,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: devuan-build-${{ github.event_name }}-${{ github.event.pull_request.number || inputs.pull_request || github.ref }}
+  group: devuan-build-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || inputs.pull_request || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -43,9 +53,16 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           PR_NUMBER: ${{ inputs.pull_request }}
           DEFAULT_REF: ${{ github.ref }}
+          SOURCE_SHA: ${{ inputs.source_sha }}
         run: |
           set -eu
-          if [ "$EVENT_NAME" = workflow_dispatch ] && [ -n "$PR_NUMBER" ]; then
+          if [ -n "$SOURCE_SHA" ]; then
+            if ! printf '%s\n' "$SOURCE_SHA" | grep -Eq '^[0-9a-f]{40}$'; then
+              echo 'Release source must be a full commit SHA.' >&2
+              exit 1
+            fi
+            printf 'ref=%s\n' "$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+          elif [ "$EVENT_NAME" = workflow_dispatch ] && [ -n "$PR_NUMBER" ]; then
             if ! printf '%s\n' "$PR_NUMBER" | grep -Eq '^[1-9][0-9]*$'; then
               echo 'PR number must be a positive integer.' >&2
               exit 1
@@ -75,6 +92,7 @@ jobs:
         env:
           RELEASE: ${{ matrix.release }}
           SOURCE_REF: ${{ steps.source.outputs.ref }}
+          RELEASE_VERSION: ${{ inputs.package_version }}
         run: |
           set -eu
           # The workspace is owned by the runner, not the container user.
@@ -82,8 +100,13 @@ jobs:
           commit=$(git rev-parse HEAD)
           short_commit=$(git rev-parse --short=12 HEAD)
           version=$(dpkg-parsechangelog -S Version)
-          ci_version="${version}+ci${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}.${RELEASE}.${short_commit}"
-          sed -i "1s/([^)]*)/(${ci_version})/" debian/changelog
+          if [ -n "$RELEASE_VERSION" ]; then
+            test "$version" = "$RELEASE_VERSION"
+            package_version="${version}+devuan.${RELEASE}"
+          else
+            package_version="${version}+ci${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}.${RELEASE}.${short_commit}"
+          fi
+          sed -i "1s/([^)]*)/(${package_version})/" debian/changelog
           dpkg-buildpackage --build=binary --no-sign
           mkdir -p artifacts
           cp ../xfce4-xmenu-plugin_*.deb artifacts/
@@ -93,7 +116,7 @@ jobs:
             printf 'Source commit: %s\n' "$commit"
             printf 'Source ref: %s\n' "$SOURCE_REF"
             printf 'Target: Devuan %s, amd64\n' "$RELEASE"
-            printf 'Package version: %s\n' "$ci_version"
+            printf 'Package version: %s\n' "$package_version"
             printf '\nBuild environment:\n'
             cat /etc/os-release
             printf '\nLibrary versions:\n'

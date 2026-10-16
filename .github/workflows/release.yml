@@ -1,0 +1,135 @@
+name: Prepare release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version matching Meson and Debian changelog (e.g. 0.4.0)'
+        required: true
+        type: string
+      source_ref:
+        description: 'Commit, branch or tag on main history to release'
+        required: true
+        default: main
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prepare-release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Validate release source and version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      sha: ${{ steps.validate.outputs.sha }}
+      version: ${{ steps.validate.outputs.version }}
+      package_version: ${{ steps.validate.outputs.package_version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate version, source and unused tag
+        id: validate
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -eu
+          python3 - <<'PY'
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
+
+          version = os.environ['VERSION']
+          if not re.fullmatch(r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)', version):
+              raise SystemExit('Use a version such as 0.4.0, without a v prefix.')
+          meson = re.search(r"^\s*version:\s*'([^']+)'", Path('meson.build').read_text(), re.M)
+          if not meson or meson[1] != version:
+              raise SystemExit('Update the Meson version before preparing this release.')
+          package = subprocess.check_output(['dpkg-parsechangelog', '-S', 'Version'], text=True).strip()
+          if not re.fullmatch(re.escape(version) + r'-[1-9][0-9]*', package):
+              raise SystemExit('Debian changelog version must match the release, e.g. 0.4.0-1.')
+          subprocess.run(['git', 'merge-base', '--is-ancestor', 'HEAD', 'origin/main'], check=True)
+          sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          tag = 'refs/tags/v' + version
+          if subprocess.run(['git', 'show-ref', '--verify', '--quiet', tag]).returncode == 0:
+              raise SystemExit('Release tag already exists; choose a new version.')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'sha={sha}\nversion={version}\npackage_version={package}\n')
+          PY
+
+  build:
+    name: Build release packages
+    needs: prepare
+    uses: ./.github/workflows/build.yml
+    with:
+      source_sha: ${{ needs.prepare.outputs.sha }}
+      package_version: ${{ needs.prepare.outputs.package_version }}
+
+  draft:
+    name: Create draft release with verified packages
+    needs: [prepare, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download checked packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: xfce4-xmenu-plugin-devuan-*-amd64-${{ github.run_id }}-${{ github.run_attempt }}
+          path: packages
+
+      - name: Collect release assets
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          SOURCE_SHA: ${{ needs.prepare.outputs.sha }}
+        run: |
+          set -eu
+          mkdir dist
+          for release in daedalus excalibur; do
+            directory="packages/xfce4-xmenu-plugin-devuan-${release}-amd64-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+            (cd "$directory" && sha256sum --check SHA256SUMS)
+            cp "$directory"/*.deb "$directory"/*.buildinfo "$directory"/*.changes dist/
+            cp "$directory/BUILD-INFO.txt" "dist/BUILD-INFO-devuan-${release}-amd64.txt"
+            cp "$directory/LINKED-LIBRARIES.txt" "dist/LINKED-LIBRARIES-devuan-${release}-amd64.txt"
+          done
+          (cd dist && sha256sum -- * > SHA256SUMS)
+          {
+            printf 'Xmenu %s\n\n' "$VERSION"
+            printf 'Source commit: `%s`\n\n' "$SOURCE_SHA"
+            printf 'Packages: Devuan Daedalus (5) and Excalibur (6), amd64. Choose the package matching your system.\n\n'
+            printf 'Both targets passed package installation and linked-library checks. Live panel UI behavior is not tested by CI.\n\n'
+            printf 'Verify downloads using `sha256sum --check SHA256SUMS`.\n\n'
+            printf 'Install with `sudo apt install ./xfce4-xmenu-plugin_<version>_amd64.deb`, then restart the panel with `xfce4-panel -r`.\n'
+          } > release-notes.md
+
+      - name: Prepare draft for manual publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+          SOURCE_SHA: ${{ needs.prepare.outputs.sha }}
+        run: |
+          set -eu
+          existing_tag=$(gh api "repos/${GH_REPO}/git/matching-refs/tags/v${VERSION}" \
+            --jq ".[] | select(.ref == \"refs/tags/v${VERSION}\") | .ref")
+          if [ -n "$existing_tag" ]; then
+            echo 'Release tag already exists; refusing to attach packages to another source.' >&2
+            exit 1
+          fi
+          gh release create "v${VERSION}" dist/* \
+            --target "$SOURCE_SHA" \
+            --title "Xmenu ${VERSION}" \
+            --notes-file release-notes.md \
+            --generate-notes \
+            --draft
+          printf '### Draft release prepared\n\nReview the packages and notes in [Releases](https://github.com/%s/releases), then click **Publish release** when ready.\n' "$GH_REPO" >> "$GITHUB_STEP_SUMMARY"
