@@ -1,5 +1,5 @@
 project('xfce4-xmenu-plugin', 'c',
-  version: '0.4.0',
+  version: '0.4.1',
   license: 'GPL-2.0-or-later',
   default_options: [
     'c_std=gnu11',

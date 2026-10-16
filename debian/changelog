@@ -1,3 +1,10 @@
+xfce4-xmenu-plugin (0.4.1-1) stable; urgency=medium
+
+  * Keep the Command logo centered with dynamic panel spacing.
+  * Fix Command icon availability detection at startup.
+
+ -- Cowboy of Christ <8753477+Cowboy-of-Christ@users.noreply.github.com>  Fri, 16 Oct 2026 15:32:37 -0300
+
 xfce4-xmenu-plugin (0.4.0-1) stable; urgency=medium
 
   * Rename the plugin to Xmenu and use Command logo assets.
