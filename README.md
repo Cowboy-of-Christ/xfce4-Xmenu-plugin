@@ -62,7 +62,7 @@ sudo apt install meson ninja-build gcc pkg-config \
 
 The **Build Devuan packages** GitHub Actions workflow builds installable `.deb` packages for **Devuan Daedalus (5)** and **Devuan Excalibur (6)** on **amd64**. Each build uses the corresponding official `devuan/devuan` container, packages the plugin with the existing Debian packaging, and checks package installation and linked runtime libraries. It does not require systemd to run.
 
-Builds run automatically on pushes to `main` (including PR merges) and pull requests targeting `main`. PR builds test GitHub's temporary merge with the base branch.
+Builds run automatically when pull requests targeting `main` are opened, updated, or reopened. PR builds test GitHub's temporary merge with the base branch. Pushes and merges to `main` do not trigger another build; release packages are built through **Prepare release** below.
 
 Once the workflow is merged into `main`, you can also run it manually:
 
@@ -77,7 +77,7 @@ CI versions include the workflow run, attempt, target release and source commit 
 
 ### Preparing a Release
 
-Release packages are prepared manually; merging a PR only runs the development builds above.
+Release packages are prepared manually; merging a PR does not trigger a build.
 
 1. Choose a new version, such as `0.4.0`. Update `version` in `meson.build` and add a matching entry to `debian/changelog`, such as `0.4.0-1`, with the release changes. Merge these updates into `main`.
 2. Open **Actions → Prepare release → Run workflow**, using the workflow from **main**. Enter the version without `v` and a source commit, branch or tag (default: `main`). The selected commit must be in `main` history and contain the matching version metadata. Existing release tags are rejected.

@@ -11,8 +11,6 @@ on:
         description: 'Debian version before the per-Devuan suffix'
         required: true
         type: string
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
