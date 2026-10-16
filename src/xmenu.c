@@ -129,7 +129,9 @@ xmenu_construct(XfcePanelPlugin *plugin)
 
     /* Create icon */
     icon = gtk_image_new_from_icon_name(XMENU_ICON_NAME, GTK_ICON_SIZE_BUTTON);
-    if (!gtk_image_get_pixbuf(GTK_IMAGE(icon))) {
+    if (!gtk_icon_theme_has_icon(gtk_icon_theme_get_for_screen(
+                                    gtk_widget_get_screen(xmenu->button)),
+                                XMENU_ICON_NAME)) {
         /* Fallback to distributor logo if Command logo not found */
         gtk_image_set_from_icon_name(GTK_IMAGE(icon), XMENU_FALLBACK_ICON, GTK_ICON_SIZE_BUTTON);
     }
