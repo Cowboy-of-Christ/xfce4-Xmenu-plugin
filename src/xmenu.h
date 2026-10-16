@@ -16,8 +16,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __APPLEMENU_H__
-#define __APPLEMENU_H__
+#ifndef __XMENU_H__
+#define __XMENU_H__
 
 #include <gtk/gtk.h>
 #include <libxfce4panel/libxfce4panel.h>
@@ -25,12 +25,12 @@
 G_BEGIN_DECLS
 
 /* Plugin definitions */
-#define APPLEMENU_ICON_NAME "command-logo"
-#define APPLEMENU_FALLBACK_ICON "distributor-logo"
-#define DEFAULT_SOFTWARE_UPDATE_COMMAND ""
-#define DEFAULT_ABOUT_COMPUTER_COMMAND ""
-#define DEFAULT_FORCE_QUIT_COMMAND "xkill"
-#define DEFAULT_APP_STORE_COMMAND "pamac-manager"
+#define XMENU_ICON_NAME "command-logo"
+#define XMENU_FALLBACK_ICON "distributor-logo"
+#define DEFAULT_SOFTWARE_UPDATE_COMMAND "lcos-updates"
+#define DEFAULT_ABOUT_COMPUTER_COMMAND "lunduke-about"
+#define DEFAULT_FORCE_QUIT_COMMAND "xfce4-taskmanager"
+#define DEFAULT_APP_STORE_COMMAND "synaptic-pkexec"
 #define DEFAULT_TRANSPARENCY 100
 
 /* Menu item identifiers */
@@ -47,8 +47,8 @@ typedef enum {
     MENU_ITEM_SHUTDOWN,
     MENU_ITEM_LOCK,
     MENU_ITEM_LOGOUT
-} AppleMenuItemType;
+} XmenuItemType;
 
 G_END_DECLS
 
-#endif /* !__APPLEMENU_H__ */
+#endif /* !__XMENU_H__ */

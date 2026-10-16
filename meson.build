@@ -1,4 +1,4 @@
-project('xfce4-applemenu-plugin', 'c',
+project('xfce4-xmenu-plugin', 'c',
   version: '0.3.0',
   license: 'GPL-2.0-or-later',
   default_options: [

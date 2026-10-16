@@ -52,7 +52,7 @@ debian/*.log
 debian/*.substvars
 debian/*.debhelper
 debian/debhelper-build-stamp
-debian/xfce4-applemenu-plugin/
+debian/xfce4-xmenu-plugin/
 debian/.debhelper/
 debian/tmp/
 

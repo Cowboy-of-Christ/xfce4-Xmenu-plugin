@@ -1,10 +1,10 @@
-# Contributing to xfce4-applemenu-plugin
+# Contributing to xfce4-xmenu-plugin
 
-Thank you for your interest in contributing to xfce4-applemenu-plugin! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to xfce4-xmenu-plugin! This document provides guidelines and instructions for contributing to the project.
 
 ## Table of Contents
 
-- [Code of Conduct](#code-of-conduct)
+- [Code of Ethics](#code-of-ethics)
 - [Getting Started](#getting-started)
 - [Development Setup](#development-setup)
 - [Making Changes](#making-changes)
@@ -14,9 +14,9 @@ Thank you for your interest in contributing to xfce4-applemenu-plugin! This docu
 - [Documentation](#documentation)
 - [Reporting Issues](#reporting-issues)
 
-## Code of Conduct
+## Code of Ethics
 
-This project follows the [Xfce Code of Conduct](https://xfce.org/about/code-of-conduct). Please read and follow it in all your interactions with the project.
+This project follows the [Code of Ethics](CodeOfEthics.md). Please read and follow it in all your interactions with the project.
 
 ## Getting Started
 
@@ -34,12 +34,12 @@ Before contributing, ensure you have:
 1. Fork the repository on GitHub
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/xfce4-applemenu-plugin.git
-   cd xfce4-applemenu-plugin
+   git clone https://github.com/YOUR_USERNAME/xfce4-Xmenu-plugin.git
+   cd xfce4-Xmenu-plugin
    ```
 3. Add the upstream repository:
    ```bash
-   git remote add upstream https://github.com/ORIGINAL_OWNER/xfce4-applemenu-plugin.git
+   git remote add upstream https://github.com/Cowboy-of-Christ/xfce4-Xmenu-plugin.git
    ```
 
 ## Development Setup
@@ -263,7 +263,7 @@ Add new tests for new features when possible.
 
 ```c
 /**
- * applemenu_get_active_window:
+ * xmenu_get_active_window:
  * @panel: The XfcePanelPlugin instance
  * 
  * Gets the currently active window.
@@ -271,7 +271,7 @@ Add new tests for new features when possible.
  * Returns: (transfer none): The active window or NULL
  */
 static GtkWindow *
-applemenu_get_active_window (XfcePanelPlugin *panel)
+xmenu_get_active_window (XfcePanelPlugin *panel)
 {
     /* Implementation */
 }
@@ -311,7 +311,7 @@ If you need help:
 
 ## License
 
-By contributing to xfce4-applemenu-plugin, you agree that your contributions will be licensed under the same license as the project (check LICENSE file).
+By contributing to xfce4-xmenu-plugin, you agree that your contributions will be licensed under the same license as the project (check LICENSE file).
 
 ## Recognition
 
@@ -320,4 +320,4 @@ Contributors will be recognized in:
 - Release notes for significant contributions
 - Project documentation
 
-Thank you for contributing to xfce4-applemenu-plugin!
+Thank you for contributing to xfce4-xmenu-plugin!

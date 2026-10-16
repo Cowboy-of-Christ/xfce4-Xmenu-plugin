@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the xfce-applemenu plugin will be documented in this file.
+All notable changes to the xfce-xmenu plugin will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -28,13 +28,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Metadata
 - Updated all copyright headers to Kamil 'Novik' Nowicki <novik@axisos.org>
 - Added project website: https://axisos.org
-- Updated repository URL: https://github.com/Axis0S/xfce4-applemenu-plugin
+- Updated repository URL: https://github.com/Cowboy-of-Christ/xfce4-Xmenu-plugin
 
 ## [0.1.0] - 2025-01-22
 
 ### Added
-- Initial release of xfce-applemenu plugin
-- Apple-style menu for XFCE panel with macOS-inspired design
+- Initial release of xfce-xmenu plugin
+- macOS-style menu for XFCE panel with macOS-inspired design
 - Menu items include:
   - About This Computer (shows system information)
   - System Preferences (launches xfce4-settings-manager)

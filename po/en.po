@@ -11,104 +11,104 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/applemenu.c:90 ../src/applemenu.desktop.in.h:1
-msgid "Apple Menu"
+#: ../src/xmenu.c:90 ../src/xmenu.desktop.in.h:1
+msgid "Xmenu"
 msgstr ""
 
 #. About This Computer
-#: ../src/applemenu.c:178
+#: ../src/xmenu.c:178
 msgid "_About This Computer"
 msgstr ""
 
 #. System Preferences
-#: ../src/applemenu.c:192
+#: ../src/xmenu.c:192
 msgid "System _Preferences..."
 msgstr ""
 
 #. App Store (Pamac)
-#: ../src/applemenu.c:201
+#: ../src/xmenu.c:201
 msgid "_App Store..."
 msgstr ""
 
-#: ../src/applemenu.c:216
+#: ../src/xmenu.c:216
 msgid "Recent _Items"
 msgstr ""
 
 #. Force Quit
-#: ../src/applemenu.c:230
+#: ../src/xmenu.c:230
 msgid "_Force Quit..."
 msgstr ""
 
 #. Sleep
-#: ../src/applemenu.c:244
+#: ../src/xmenu.c:244
 msgid "_Sleep"
 msgstr ""
 
 #. Restart
-#: ../src/applemenu.c:253
+#: ../src/xmenu.c:253
 msgid "_Restart..."
 msgstr ""
 
 #. Shut Down
-#: ../src/applemenu.c:262
+#: ../src/xmenu.c:262
 msgid "Shut _Down..."
 msgstr ""
 
 #. Lock Screen
-#: ../src/applemenu.c:276
+#: ../src/xmenu.c:276
 msgid "_Lock Screen"
 msgstr ""
 
 #. Log Out
-#: ../src/applemenu.c:285
+#: ../src/xmenu.c:285
 msgid "Log _Out..."
 msgstr ""
 
 #. Create dialog
-#: ../src/applemenu.c:347
+#: ../src/xmenu.c:347
 msgid "About This Computer"
 msgstr ""
 
-#: ../src/applemenu.c:350
+#: ../src/xmenu.c:350
 msgid "_Close"
 msgstr ""
 
-#: ../src/applemenu.c:366
+#: ../src/xmenu.c:366
 msgid "System Information"
 msgstr ""
 
-#: ../src/applemenu.c:390
+#: ../src/xmenu.c:390
 msgid "Failed to open System Preferences"
 msgstr ""
 
-#: ../src/applemenu.c:401
+#: ../src/xmenu.c:401
 msgid "Failed to open App Store (Pamac Manager)"
 msgstr ""
 
-#: ../src/applemenu.c:412
+#: ../src/xmenu.c:412
 msgid "Failed to launch Force Quit"
 msgstr ""
 
-#: ../src/applemenu.c:423
+#: ../src/xmenu.c:423
 msgid "Failed to suspend system"
 msgstr ""
 
-#: ../src/applemenu.c:434
+#: ../src/xmenu.c:434
 msgid "Failed to restart system"
 msgstr ""
 
-#: ../src/applemenu.c:445
+#: ../src/xmenu.c:445
 msgid "Failed to shutdown system"
 msgstr ""
 
-#: ../src/applemenu.c:456
+#: ../src/xmenu.c:456
 msgid "Failed to lock screen"
 msgstr ""
 
-#: ../src/applemenu.c:467
+#: ../src/xmenu.c:467
 msgid "Failed to log out"
 msgstr ""
 
-#: ../src/applemenu.desktop.in.h:2
+#: ../src/xmenu.desktop.in.h:2
 msgid "macOS-style system menu for XFCE"
 msgstr ""

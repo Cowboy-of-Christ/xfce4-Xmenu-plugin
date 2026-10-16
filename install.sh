@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# XFCE Apple Menu Plugin Installation Script
+# XFCE Xmenu Plugin Installation Script
 # Copyright (C) 2024 Kamil 'Novik' Nowicki <novik@axisos.org>
 #
 # This script auto-detects the Linux distribution and installs the plugin
@@ -176,7 +176,7 @@ determine_paths() {
 
 # Check if the plugin is already built
 check_build() {
-    if [ ! -f "builddir/src/libapplemenu.so" ]; then
+    if [ ! -f "builddir/src/libxmenu.so" ]; then
         print_error "Plugin not built. Please run ./build.sh first"
         exit 1
     fi
@@ -194,13 +194,13 @@ install_plugin() {
     
     # Install plugin library
     print_info "Installing plugin library..."
-    cp -f "builddir/src/libapplemenu.so" "$PLUGIN_DIR/"
-    chmod 755 "$PLUGIN_DIR/libapplemenu.so"
+    cp -f "builddir/src/libxmenu.so" "$PLUGIN_DIR/"
+    chmod 755 "$PLUGIN_DIR/libxmenu.so"
     
     # Install desktop file
     print_info "Installing desktop file..."
-    cp -f "data/applemenu.desktop" "$DESKTOP_DIR/"
-    chmod 644 "$DESKTOP_DIR/applemenu.desktop"
+    cp -f "builddir/src/xmenu.desktop" "$DESKTOP_DIR/"
+    chmod 644 "$DESKTOP_DIR/xmenu.desktop"
     
     # Install icons
     print_info "Installing icons..."
@@ -236,7 +236,7 @@ restart_panel() {
 # Main installation process
 main() {
     echo "======================================"
-    echo "XFCE Apple Menu Plugin Installer"
+    echo "XFCE Xmenu Plugin Installer"
     echo "======================================"
     echo
     
@@ -254,8 +254,8 @@ main() {
     # Confirm installation
     echo
     print_warning "This will install the plugin to system directories:"
-    echo "  - Plugin: $PLUGIN_DIR/libapplemenu.so"
-    echo "  - Desktop: $DESKTOP_DIR/applemenu.desktop"
+    echo "  - Plugin: $PLUGIN_DIR/libxmenu.so"
+    echo "  - Desktop: $DESKTOP_DIR/xmenu.desktop"
     echo "  - Icons: $ICON_DIR"
     echo
     read -p "Continue with installation? [y/N] " -n 1 -r
@@ -282,7 +282,7 @@ main() {
     
     echo
     print_success "Installation complete!"
-    print_info "You can now add the Apple Menu to your panel through 'Panel Preferences' -> 'Items'"
+    print_info "You can now add the Xmenu to your panel through 'Panel Preferences' -> 'Items'"
 }
 
 # Run main function

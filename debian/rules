@@ -17,7 +17,7 @@ override_dh_auto_configure:
 override_dh_auto_install:
 	dh_auto_install
 	# Move the entire directory to debian/tmp to preserve structure
-	mv debian/xfce4-applemenu-plugin debian/tmp
+	mv debian/xfce4-xmenu-plugin debian/tmp
 	# Remove libtool files if any
 	find debian/tmp -name '*.la' -delete
 
