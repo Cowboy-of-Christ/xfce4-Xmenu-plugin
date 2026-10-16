@@ -103,6 +103,19 @@ Use the package matching your system's Devuan base release. For derivatives, con
 
 CI versions include the workflow run, attempt, target release and source commit so test packages are identifiable. The workflow creates downloadable build artifacts; it does not publish a GitHub Release.
 
+### Preparing a Release
+
+Release packages are prepared manually; merging a PR only runs the development builds above.
+
+1. Choose a new version, such as `0.4.0`. Update `version` in `meson.build` and add a matching entry to `debian/changelog`, such as `0.4.0-1`, with the release changes. Merge these updates into `main`.
+2. Open **Actions → Prepare release → Run workflow**, using the workflow from **main**. Enter the version without `v` and a source commit, branch or tag (default: `main`). The selected commit must be in `main` history and contain the matching version metadata. Existing release tags are rejected.
+3. The action pins that commit, builds and checks both Devuan packages, then creates a **draft** release named `v<version>`. It attaches `.deb` packages, `.buildinfo` and `.changes` files, per-target build and library information, checksums, and generated release notes.
+4. Download the package for your Devuan version and test it on your desktop. Review the draft's notes and assets under **Releases**, then click **Publish release** when ready. The action never publishes automatically.
+
+Release package versions distinguish the targets, for example `0.4.0-1+devuan.daedalus` and `0.4.0-1+devuan.excalibur`, without the development `+ci` suffix. Download all assets into one directory and run `sha256sum --check SHA256SUMS` to verify them. The release assets remain available independently of the 30-day Actions artifacts.
+
+If a build fails, no draft is created. To retry a failed run, choose **Re-run all jobs** so both package artifacts are regenerated together. To replace an already prepared draft, delete that draft and its tag before retrying; published versions should receive a new version rather than being overwritten.
+
 ## Configuration
 
 Right-click on the plugin in the panel and select "Properties" to access:
