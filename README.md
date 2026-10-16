@@ -1,12 +1,12 @@
-# XFCE4 Apple Menu Plugin
+# XFCE4 Xmenu Plugin
 
 A panel plugin for XFCE4 that mimics the macOS Apple menu, providing a familiar and intuitive system menu experience for XFCE desktop users.
 
-![XFCE4 Apple Menu Plugin]
+![XFCE4 Xmenu Plugin]
 
 ## Features
 
-- 🍎 **Apple-style Menu**: Familiar dropdown menu with Command logo
+- 🍎 **Xmenu**: Familiar dropdown menu with Command logo
 - 💻 **System Information**: Quick access to system details
 - 📦 **Package Management**: Integration with system package manager
 - 📄 **Recent Items**: Track and access recently used files and applications
@@ -62,8 +62,8 @@ sudo apt install meson ninja-build gcc pkg-config \
 
 ```bash
 # Clone the repository
-git clone https://github.com/Axis0S/xfce4-applemenu-plugin.git
-cd xfce4-applemenu-plugin
+git clone https://github.com/Cowboy-of-Christ/xfce4-Xmenu-plugin.git
+cd xfce4-Xmenu-plugin
 
 # Build and install using Meson
 meson setup build --prefix=/usr
@@ -83,7 +83,7 @@ xfce4-panel -r
 ```bash
 # Build and install Debian package
 ./build-deb.sh
-sudo dpkg -i ../xfce4-applemenu-plugin_*.deb
+sudo dpkg -i ../xfce4-xmenu-plugin_*.deb
 ```
 
 ## Automatic Builds (Devuan)
@@ -97,7 +97,7 @@ Once the workflow is merged into `main`, you can also run it manually:
 1. Open **Actions → Build Devuan packages → Run workflow**.
 2. Select a branch, or enter an optional **pull_request** number to build that PR's latest source without merging it. A manual PR build uses the PR head, rather than the temporary merge.
 3. Open the completed run and download the artifact for your Devuan release. Extract the ZIP to obtain the `.deb`, checksums and build information. Artifacts are retained for 30 days.
-4. Install the main package with `sudo apt install ./xfce4-applemenu-plugin_<version>_amd64.deb`, then restart the panel with `xfce4-panel -r`.
+4. Install the main package with `sudo apt install ./xfce4-xmenu-plugin_<version>_amd64.deb`, then restart the panel with `xfce4-panel -r`.
 
 Use the package matching your system's Devuan base release. For derivatives, confirm that the base release and Xfce/GTK libraries match; a successful CI build does not prove runtime compatibility with a customized desktop or XLibre setup. These builds do not test the live panel UI. If unsure, inspect `/etc/os-release` and `apt-cache policy xfce4-panel libc6`. ARM and 32-bit systems are not covered.
 
@@ -137,12 +137,12 @@ The "App Store" menu item can be configured to launch your preferred package man
 The plugin respects your GTK+ theme. For custom styling, add to `~/.config/gtk-3.0/gtk.css`:
 
 ```css
-#xfce4-applemenu-plugin button {
+#xfce4-xmenu-plugin button {
     padding: 4px 8px;
     border-radius: 4px;
 }
 
-#xfce4-applemenu-plugin button:hover {
+#xfce4-xmenu-plugin button:hover {
     background-color: @theme_selected_bg_color;
 }
 ```
@@ -151,7 +151,7 @@ The plugin respects your GTK+ theme. For custom styling, add to `~/.config/gtk-3
 
 ### Plugin not appearing
 1. Ensure the plugin is properly installed: `ls /usr/lib/xfce4/panel/plugins/`
-2. Add it through Panel Preferences → Items → Add → Apple Menu
+2. Add it through Panel Preferences → Items → Add → Xmenu
 
 ### Package manager not launching
 1. Verify your package manager is installed
@@ -187,11 +187,4 @@ This project is licensed under the GPL-2.0+ License - see the [LICENSE](LICENSE)
 
 - [Documentation](DOCUMENT.md)
 - [XFCE Panel Plugin Guide](https://docs.xfce.org/xfce/xfce4-panel/theming)
-- [Report Issues](https://github.com/Axis0S/xfce4-applemenu-plugin/issues)
-
-## Author
-
-Kamil 'Novik' Nowicki
-- Email: novik@axisos.org
-- Website: https://axisos.org
-- GitHub: https://github.com/Axis0S
+- [Report Issues](https://github.com/Cowboy-of-Christ/xfce4-Xmenu-plugin/issues)

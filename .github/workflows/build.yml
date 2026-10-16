@@ -86,9 +86,9 @@ jobs:
           sed -i "1s/([^)]*)/(${ci_version})/" debian/changelog
           dpkg-buildpackage --build=binary --no-sign
           mkdir -p artifacts
-          cp ../xfce4-applemenu-plugin_*.deb artifacts/
-          cp ../xfce4-applemenu-plugin_*.buildinfo artifacts/
-          cp ../xfce4-applemenu-plugin_*.changes artifacts/
+          cp ../xfce4-xmenu-plugin_*.deb artifacts/
+          cp ../xfce4-xmenu-plugin_*.buildinfo artifacts/
+          cp ../xfce4-xmenu-plugin_*.changes artifacts/
           {
             printf 'Source commit: %s\n' "$commit"
             printf 'Source ref: %s\n' "$SOURCE_REF"
@@ -104,9 +104,9 @@ jobs:
       - name: Verify package installation and linked libraries
         run: |
           set -eu
-          apt-get install -y --no-install-recommends ./artifacts/xfce4-applemenu-plugin_*.deb
-          dpkg-query -W xfce4-applemenu-plugin
-          plugin=$(dpkg-query -L xfce4-applemenu-plugin | sed -n '/\/libapplemenu\.so$/p')
+          apt-get install -y --no-install-recommends ./artifacts/xfce4-xmenu-plugin_*.deb
+          dpkg-query -W xfce4-xmenu-plugin
+          plugin=$(dpkg-query -L xfce4-xmenu-plugin | sed -n '/\/libxmenu\.so$/p')
           test -n "$plugin"
           ldd "$plugin" > artifacts/LINKED-LIBRARIES.txt
           cat artifacts/LINKED-LIBRARIES.txt
@@ -114,12 +114,12 @@ jobs:
             echo 'The plugin has missing runtime libraries.' >&2
             exit 1
           fi
-          dpkg-deb --contents artifacts/xfce4-applemenu-plugin_*.deb
+          dpkg-deb --contents artifacts/xfce4-xmenu-plugin_*.deb
 
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
-          name: xfce4-applemenu-plugin-devuan-${{ matrix.release }}-amd64-${{ github.run_id }}-${{ github.run_attempt }}
+          name: xfce4-xmenu-plugin-devuan-${{ matrix.release }}-amd64-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/
           if-no-files-found: error
           retention-days: 30

@@ -1,8 +1,8 @@
-# XFCE4 Apple Menu Plugin Documentation
+# XFCE4 Xmenu Plugin Documentation
 
 ## Overview
 
-The XFCE4 Apple Menu Plugin is a panel plugin that mimics the macOS top bar main menu functionality, providing a unified system menu with the iconic Command logo as its launcher. This plugin brings the familiar macOS-style menu experience to XFCE desktop environments.
+The XFCE4 Xmenu Plugin is a panel plugin that mimics the macOS top bar main menu functionality, providing a unified system menu with the iconic Command logo as its launcher. This plugin brings the familiar macOS-style menu experience to XFCE desktop environments.
 
 ## Features
 
@@ -12,7 +12,7 @@ The XFCE4 Apple Menu Plugin is a panel plugin that mimics the macOS top bar main
 - **System Integration**: Deep integration with XFCE4 panel and system services
 
 ### Menu Items
-The plugin replicates the standard macOS Apple menu structure:
+The plugin replicates a macOS-inspired system menu structure:
 
 1. **About This Computer**
    - Shows system information
@@ -48,10 +48,10 @@ The plugin replicates the standard macOS Apple menu structure:
 
 ### Plugin Structure
 ```
-xfce-applemenu/
+xfce-xmenu/
 ├── src/
-│   ├── applemenu.c          # Main plugin code
-│   ├── applemenu.h          # Header definitions
+│   ├── xmenu.c          # Main plugin code
+│   ├── xmenu.h          # Header definitions
 │   ├── menu-builder.c       # Menu construction logic
 │   ├── menu-builder.h
 │   ├── system-info.c        # System information gathering
@@ -60,8 +60,8 @@ xfce-applemenu/
 │   └── recent-items.h
 ├── data/
 │   ├── icons/               # Command logo and other icons
-│   ├── applemenu.desktop    # Desktop entry file
-│   └── applemenu.xml        # Menu configuration
+│   ├── xmenu.desktop    # Desktop entry file
+│   └── xmenu.xml        # Menu configuration
 ├── po/                      # Translations
 ├── meson.build             # Meson build configuration
 ├── meson_options.txt       # Build options
@@ -90,7 +90,7 @@ xfce-applemenu/
 The plugin registers with the XFCE4 panel using the standard plugin API:
 
 ```c
-XFCE_PANEL_PLUGIN_REGISTER(applemenu_construct);
+XFCE_PANEL_PLUGIN_REGISTER(xmenu_construct);
 ```
 
 ### Menu Construction
@@ -122,14 +122,14 @@ Gathered using various system calls and libraries:
 ## Configuration
 
 ### User Settings
-Stored in `~/.config/xfce4/panel/applemenu-{id}.rc`:
+Stored in `~/.config/xfce4/panel/xmenu-{id}.rc`:
 
 ```ini
 [Configuration]
 show_recent_items=true
 recent_items_max=10
 show_system_info=true
-use_apple_logo=true
+use_xmenu_logo=true
 custom_icon_path=
 menu_width=250
 show_descriptions=true
@@ -148,21 +148,21 @@ Configurable through XFCE4 Panel preferences:
 The plugin supports GTK+ CSS theming:
 
 ```css
-#xfce4-applemenu-plugin {
+#xfce4-xmenu-plugin {
     background-color: transparent;
     border: none;
 }
 
-#xfce4-applemenu-plugin button {
+#xfce4-xmenu-plugin button {
     padding: 2px 8px;
     border-radius: 4px;
 }
 
-#xfce4-applemenu-plugin button:hover {
+#xfce4-xmenu-plugin button:hover {
     background-color: @selected_bg_color;
 }
 
-.applemenu-dropdown {
+.xmenu-dropdown {
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
@@ -264,11 +264,11 @@ This plugin is licensed under the GNU General Public License version 2 or later 
 ## Support
 
 ### Bug Reports
-File issues at: https://github.com/Axis0S/xfce4-applemenu-plugin
+File issues at: https://github.com/Cowboy-of-Christ/xfce4-Xmenu-plugin
 
 ### Documentation
 - This document
-- Man page: `man xfce4-applemenu-plugin`
+- Man page: `man xfce4-xmenu-plugin`
 - XFCE Wiki: https://wiki.xfce.org
 
 ### Community

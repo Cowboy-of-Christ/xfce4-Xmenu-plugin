@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: xfce4-applemenu-plugin
+Upstream-Name: xfce4-xmenu-plugin
 Upstream-Contact: Kamil 'Novik' Nowicki <novik@axisos.org>
-Source: https://github.com/Axis0S/xfce4-applemenu-plugin
+Source: https://github.com/Cowboy-of-Christ/xfce4-Xmenu-plugin
 
 Files: *
 Copyright: 2024-2025 Kamil 'Novik' Nowicki <novik@axisos.org>

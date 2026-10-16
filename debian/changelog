@@ -1,4 +1,4 @@
-xfce4-applemenu-plugin (0.3.0-1) stable; urgency=medium
+xfce4-xmenu-plugin (0.3.0-1) stable; urgency=medium
 
   * Fixed deprecated GTK+ API calls for GTK3 compatibility
   * Fixed format security warnings in error dialogs
@@ -10,7 +10,7 @@ xfce4-applemenu-plugin (0.3.0-1) stable; urgency=medium
 
  -- Kamil "Novik" Nowicki <novik@axisos.org>  Wed, 23 Jan 2025 12:00:00 +0100
 
-xfce4-applemenu-plugin (0.2.0-1) unstable; urgency=medium
+xfce4-xmenu-plugin (0.2.0-1) unstable; urgency=medium
 
   * Initial Debian package release
   * Fixed menu toggle issue on second click
