@@ -16,7 +16,7 @@ Thank you for your interest in contributing to xfce4-xmenu-plugin! This document
 
 ## Code of Ethics
 
-This project follows the [Code of Ethics](codeofethics.md). Please read and follow it in all your interactions with the project.
+This project follows the [Code of Ethics](CodeOfEthics.md). Please read and follow it in all your interactions with the project.
 
 ## Getting Started
 
