@@ -5,6 +5,22 @@ All notable changes to the xfce-xmenu plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-10-16
+
+### Added
+- Configurable About This Computer, Software Update and Force Quit commands.
+- Automatic Devuan Daedalus and Excalibur amd64 package builds.
+- Manual release preparation with checked packages and draft GitHub Releases.
+- Code of Ethics.
+
+### Changed
+- Rename the plugin to Xmenu and replace Apple logo assets with Command logos.
+- Default to `synaptic-pkexec`, `lunduke-about`, `xfce4-taskmanager` and `lcos-updates` for menu applications.
+- Update the Debian package maintainer to Cowboy of Christ.
+
+### Fixed
+- Prevent themed borders and bevels on the panel button.
+
 ## [0.2.0] - 2025-01-22
 
 ### Fixed
