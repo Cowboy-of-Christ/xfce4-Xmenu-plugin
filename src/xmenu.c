@@ -134,6 +134,8 @@ xmenu_construct(XfcePanelPlugin *plugin)
         gtk_image_set_from_icon_name(GTK_IMAGE(icon), XMENU_FALLBACK_ICON, GTK_ICON_SIZE_BUTTON);
     }
     xmenu->icon = icon;
+    gtk_widget_set_halign(icon, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(icon, GTK_ALIGN_CENTER);
     gtk_container_add(GTK_CONTAINER(xmenu->button), icon);
     gtk_widget_show(icon);
 
@@ -147,6 +149,7 @@ xmenu_construct(XfcePanelPlugin *plugin)
 
     /* Load configuration */
     xmenu_load_config(xmenu);
+    xmenu_size_changed(plugin, xfce_panel_plugin_get_size(plugin), xmenu);
 
     /* Connect plugin signals */
     g_signal_connect(G_OBJECT(plugin), "free-data",
@@ -378,25 +381,13 @@ xmenu_create_menu(XmenuPlugin *xmenu)
 static gboolean
 xmenu_size_changed(XfcePanelPlugin *plugin G_GNUC_UNUSED, guint size, XmenuPlugin *xmenu)
 {
-    GtkIconSize icon_size;
-    gint icon_width;
+    gint padding = MAX(2, (gint)size / 8);
+    gint icon_size = MAX(1, (gint)size - 2 * padding);
 
-    /* Determine icon size based on panel size */
-    if (size <= 16)
-        icon_size = GTK_ICON_SIZE_MENU;
-    else if (size <= 22)
-        icon_size = GTK_ICON_SIZE_SMALL_TOOLBAR;
-    else if (size <= 24)
-        icon_size = GTK_ICON_SIZE_LARGE_TOOLBAR;
-    else if (size <= 32)
-        icon_size = GTK_ICON_SIZE_DND;
-    else
-        icon_size = GTK_ICON_SIZE_DIALOG;
-
-    /* Update icon */
-    gtk_image_set_from_icon_name(GTK_IMAGE(xmenu->icon),
-                                 xmenu->use_xmenu_logo ? XMENU_ICON_NAME : XMENU_FALLBACK_ICON,
-                                 icon_size);
+    /* Keep space around the logo as the panel grows or shrinks. Set an
+     * explicit pixel size so GTK's standard icon sizes cannot fill the panel.
+     * Preserve the selected icon when resizing. */
+    gtk_image_set_pixel_size(GTK_IMAGE(xmenu->icon), icon_size);
 
     /* Set button size */
     gtk_widget_set_size_request(GTK_WIDGET(xmenu->button), size, size);
