@@ -24,7 +24,7 @@ The plugin replicates a macOS-inspired system menu structure:
    - Categorized settings shortcuts
 
 3. **App Store** (Optional)
-   - Links to pamac-manager (Arch/Manjaro package manager GUI)
+   - Launches synaptic-pkexec by default (configurable package manager GUI)
    - Software center integration
    - Quick access to system updates
 
@@ -126,6 +126,10 @@ Stored in `~/.config/xfce4/panel/xmenu-{id}.rc`:
 
 ```ini
 [Configuration]
+app-store-command=synaptic-pkexec
+about-computer-command=lunduke-about
+force-quit-command=xfce4-taskmanager
+software-update-command=lcos-updates
 show_recent_items=true
 recent_items_max=10
 show_system_info=true

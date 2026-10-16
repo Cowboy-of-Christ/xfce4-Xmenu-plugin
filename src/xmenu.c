@@ -549,7 +549,7 @@ xmenu_force_quit(GtkMenuItem *item G_GNUC_UNUSED, gpointer data)
     const gchar *command = xmenu->force_quit_command[0] != '\0'
         ? xmenu->force_quit_command : DEFAULT_FORCE_QUIT_COMMAND;
 
-    /* Launch the configured application, or xkill when empty. */
+    /* Launch the configured application, or the default when empty. */
     GError *error = NULL;
     if (!g_spawn_command_line_async(command, &error)) {
         xfce_dialog_show_error(NULL, error, _("Failed to launch Force Quit"));
@@ -871,7 +871,7 @@ xmenu_configure_plugin(XfcePanelPlugin *plugin, XmenuPlugin *xmenu)
     xmenu_add_command_entry(GTK_GRID(grid), row++, _("_App Store command:"),
                                 NULL, &xmenu->app_store_command);
     xmenu_add_command_entry(GTK_GRID(grid), row++, _("_Force Quit command:"),
-                                _("Leave empty to use xkill."),
+                                _("Leave empty to use xfce4-taskmanager."),
                                 &xmenu->force_quit_command);
 
     /* Transparency */

@@ -117,10 +117,10 @@ Right-click on the plugin in the panel and select "Properties" to access:
 
 In Properties, enter the executable and any arguments for each menu item:
 
-- **About This Computer command**: for example, `xfce4-about` or `hardinfo`. Leave empty to use the built-in information dialog.
-- **Software Update command**: enter your installed updater executable and any arguments. Initially empty; selecting Software Update without a command prompts you to configure it in Properties.
-- **Force Quit command**: for example, `xfce4-taskmanager`. Defaults to `xkill`; an empty field also uses `xkill`.
-- **App Store command**: your preferred package manager (see below).
+- **About This Computer command**: defaults to `lunduke-about`. Leave empty to use the built-in information dialog.
+- **Software Update command**: defaults to `lcos-updates`. Selecting Software Update with an empty command prompts you to configure it in Properties.
+- **Force Quit command**: defaults to `xfce4-taskmanager`; an empty field also uses `xfce4-taskmanager`.
+- **App Store command**: defaults to `synaptic-pkexec`; you can choose another package manager (see below).
 
 The selected programs must be installed. Commands support arguments and quoted paths, using the same launcher as App Store. Shell operators such as pipes and redirection are not interpreted; use an explicit `sh -c '...'` command if needed. Settings are saved when the Properties dialog closes and restored when the panel restarts.
 

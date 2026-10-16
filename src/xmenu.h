@@ -27,10 +27,10 @@ G_BEGIN_DECLS
 /* Plugin definitions */
 #define XMENU_ICON_NAME "command-logo"
 #define XMENU_FALLBACK_ICON "distributor-logo"
-#define DEFAULT_SOFTWARE_UPDATE_COMMAND ""
-#define DEFAULT_ABOUT_COMPUTER_COMMAND ""
-#define DEFAULT_FORCE_QUIT_COMMAND "xkill"
-#define DEFAULT_APP_STORE_COMMAND "pamac-manager"
+#define DEFAULT_SOFTWARE_UPDATE_COMMAND "lcos-updates"
+#define DEFAULT_ABOUT_COMPUTER_COMMAND "lunduke-about"
+#define DEFAULT_FORCE_QUIT_COMMAND "xfce4-taskmanager"
+#define DEFAULT_APP_STORE_COMMAND "synaptic-pkexec"
 #define DEFAULT_TRANSPARENCY 100
 
 /* Menu item identifiers */
