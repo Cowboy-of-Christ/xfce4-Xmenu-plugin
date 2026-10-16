@@ -58,35 +58,7 @@ sudo apt install meson ninja-build gcc pkg-config \
 
 ## Installation
 
-### From Source
-
-```bash
-# Clone the repository
-git clone https://github.com/Cowboy-of-Christ/xfce4-Xmenu-plugin.git
-cd xfce4-Xmenu-plugin
-
-# Build and install using Meson
-meson setup build --prefix=/usr
-cd build
-ninja
-sudo ninja install
-
-# Or use the provided install script
-./install.sh
-
-# Restart XFCE Panel
-xfce4-panel -r
-```
-
-### Debian/Ubuntu
-
-```bash
-# Build and install Debian package
-./build-deb.sh
-sudo dpkg -i ../xfce4-xmenu-plugin_*.deb
-```
-
-## Automatic Builds (Devuan)
+### Automatic Builds (Devuan)
 
 The **Build Devuan packages** GitHub Actions workflow builds installable `.deb` packages for **Devuan Daedalus (5)** and **Devuan Excalibur (6)** on **amd64**. Each build uses the corresponding official `devuan/devuan` container, packages the plugin with the existing Debian packaging, and checks package installation and linked runtime libraries. It does not require systemd to run.
 
@@ -115,6 +87,34 @@ Release packages are prepared manually; merging a PR only runs the development b
 Release package versions distinguish the targets, for example `0.4.0-1+devuan.daedalus` and `0.4.0-1+devuan.excalibur`, without the development `+ci` suffix. Download all assets into one directory and run `sha256sum --check SHA256SUMS` to verify them. The release assets remain available independently of the 30-day Actions artifacts.
 
 If a build fails, no draft is created. To retry a failed run, choose **Re-run all jobs** so both package artifacts are regenerated together. To replace an already prepared draft, delete that draft and its tag before retrying; published versions should receive a new version rather than being overwritten.
+
+### From Source
+
+```bash
+# Clone the repository
+git clone https://github.com/Cowboy-of-Christ/xfce4-Xmenu-plugin.git
+cd xfce4-Xmenu-plugin
+
+# Build and install using Meson
+meson setup build --prefix=/usr
+cd build
+ninja
+sudo ninja install
+
+# Or use the provided install script
+./install.sh
+
+# Restart XFCE Panel
+xfce4-panel -r
+```
+
+### Debian/Ubuntu
+
+```bash
+# Build and install Debian package
+./build-deb.sh
+sudo dpkg -i ../xfce4-xmenu-plugin_*.deb
+```
 
 ## Configuration
 
